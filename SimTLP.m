@@ -1,4 +1,4 @@
-%simulates the MLS 4.3 manipulator
+%simulates the two link planar robot from part 4 of the notes manipulator
 clear all;
 close all;
 
@@ -15,16 +15,18 @@ g(:,:,1,2)=[1 0 0 1; 0 1 0 0;0 0 1 0;0 0 0 1]; %the COM home frames
 g(:,:,2,2)=[1 0 0 3; 0 1 0 0;0 0 1 0;0 0 0 1];
 w=[0 0 1;0 0 1]';
 q=[0 0 0;2 0 0]';
+gravity=[0;-9.81;0];
 
 J=DeriveBodyJacobians(DOF,q,w,g);
 D=DeriveD(J, I,m, DOF);
 C=DeriveC(D,DOF);
-
+gth=DeriveFK(DOF,g,w,q);
+G=DeriveG(DOF,gth,gravity);
 
 T0=0; %start of sim
 Tf=10; %end of sim
 dT=0.1; %timestep for changing torque (tau)
-T=T0:dT:Tf; %time 
+T=T0:dT:Tf; %timesteps for changing torque
 t=0; %stores all actual time steps run
 js=[]; %joint state (position and velocity)
 
@@ -46,7 +48,7 @@ ylim([-5 5]);
 zlim([-5 5]);
 view(30,30);
 for i=1:20:size(js,2) %specify framerate
-    gth=ComputeFK(js(1:DOF,i),g,w,q);
+    gth=ComputeFK(js(1,i),js(2,i));
     DrawRobot(gth,0.2);
     title(t(i));
     drawnow;
