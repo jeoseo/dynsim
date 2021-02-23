@@ -2,3 +2,4 @@ This is going to mostly be a copy of the code Simaan sent me, but I figure it's 
 
 Derive=function intended on using symbolic variables to make an expression
 Make=function intended on using the derived expression and real numbers to create some numeric result
+Sim=Dynamically simulates and visualizes some robot (executable)
