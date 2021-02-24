@@ -1,5 +1,4 @@
-%Derives the G vector in the EOM given some gth and universal gravitational vector
-
+%Derives the G vector in the EOM given some gth (the pose of the COM's of the robot) and universal gravitational vector
 function G=DeriveG(DOF,gth,gravity)
     th=sym('th',[DOF,1]);
     G=zeros(DOF,1);
@@ -13,5 +12,5 @@ function G=DeriveG(DOF,gth,gravity)
         G(i)=diff(P,th(i));
     end
     G=simplify(G);
-    matlabFunction(G,'file','ComputeG.m','vars',[th]);
+    matlabFunction(G,'file','GEN/ComputeG.m','vars',[th]);
 end

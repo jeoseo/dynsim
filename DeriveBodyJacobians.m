@@ -1,8 +1,6 @@
 %We need the Jacobians to the center of mass of each link: this is best
 %done using POE. 
 
-
-
 %COM is defined using xyz translation from the frame that the link is
 %attached to
 %this will return a 6 by DOF by DOF matrix, where each layer is a 6x3 Jacobian
@@ -27,7 +25,7 @@ function J=DeriveBodyJacobians(DOF,q,w,g)
         end
     end
     J=simplify(J);
-    matlabFunction(J,'file','ComputeBodyJacobians.m','vars',[th]);
+    matlabFunction(J,'file','GEN/ComputeBodyJacobians.m','vars',[th]);
 end
 
 

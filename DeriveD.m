@@ -2,18 +2,11 @@
 %J is the symbolic variable for the Jacobians for the COM's of all links
 %DOF can be found from J but exists separately for readability
 function D=DeriveD(J, I,m, DOF)
-
-
     th=sym('th',[DOF,1]);
     assume(th,'real');
-
-    
     D=zeros(DOF,DOF);
     D=sym(D);
-    
-    sym M;
-    
-    
+    sym M; 
     for i=1:DOF
         M=zeros(6,6);
         M=sym(M);
@@ -24,5 +17,5 @@ function D=DeriveD(J, I,m, DOF)
         D=D+J(:,:,i)'*M*J(:,:,i);
     end
     D=simplify(D);
-    matlabFunction(D,'file','ComputeD.m','vars',[th]);
+    matlabFunction(D,'file','GEN/ComputeD.m','vars',[th]);
 end

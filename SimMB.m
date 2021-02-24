@@ -1,22 +1,28 @@
-%simulates the two link planar robot from part 4 of the notes manipulator
+%simulates the manufacturing base robot
 %see SimMLS.m for more detail on the executables
 clear all;
 close all;
 
 addpath(genpath('GEN'));
 %Define some physical properties of the robot
-DOF=2;
+DOF=4;
 I(:,:,1)=eye(3);
 I(:,:,2)=eye(3);
-m=[1;1];
-tau=[0;0];
-g(:,:,1,1)=[1 0 0 2; 0 1 0 0;0 0 1 0;0 0 0 1];%the link end home frames
-g(:,:,2,1)=[1 0 0 4; 0 1 0 0;0 0 1 0;0 0 0 1];
-g(:,:,1,2)=[1 0 0 1; 0 1 0 0;0 0 1 0;0 0 0 1]; %the COM home frames
-g(:,:,2,2)=[1 0 0 3; 0 1 0 0;0 0 1 0;0 0 0 1];
-w=[0 0 1;0 0 1]';
-q=[0 0 0;2 0 0]';
-gravity=[0;-9.81;0];
+I(:,:,3)=eye(3);
+I(:,:,4)=eye(3);
+m=[1;1;1;1];
+tau=[0;0;0;0];
+g(:,:,1,1)=[1 0 0 0; 0 1 0 .185;0 0 1 .197;0 0 0 1];%the link end home frames
+g(:,:,2,1)=[1 0 0 0; 0 1 0 .535;0 0 1 .197;0 0 0 1];
+g(:,:,3,1)=[1 0 0 0; 0 1 0 .885;0 0 1 .197;0 0 0 1];
+g(:,:,4,1)=[1 0 0 0; 0 1 0 1.025;0 0 1 .197;0 0 0 1];
+g(:,:,1,2)=[1 0 0 0; 0 1 0 0;0 0 1 .197;0 0 0 1];%COM
+g(:,:,2,2)=[1 0 0 0; 0 1 0 (.535+.185)/2;0 0 1 .197;0 0 0 1];
+g(:,:,3,2)=[1 0 0 0; 0 1 0 (.885+535)/2;0 0 1 .197;0 0 0 1];
+g(:,:,4,2)=[1 0 0 0; 0 1 0 (1.025+.885)/2;0 0 1 .197;0 0 0 1];
+w=[0 0 1;1 0 0;1 0 0 ;1 0 0]';
+q=[0 0 0;0 .185 .197;0 .535 .197;0 .885 .197]';
+gravity=[0;0;-9.81];
 
 J=DeriveBodyJacobians(DOF,q,w,g);
 D=DeriveD(J, I,m, DOF);
@@ -44,13 +50,13 @@ end
 figure();
 set(gcf,'color','w');
 set(gcf,'position',[0 0 1400 900]);
-xlim([-5 5]);
-ylim([-5 5]);
-zlim([-5 5]);
+xlim([-2 2]);
+ylim([-2 2]);
+zlim([-2 2]);
 view(30,30);
 for i=1:20:size(js,2) %specify framerate
-    gth=ComputeFK(js(1,i),js(2,i));
-    DrawRobot(gth,0.2);
+    gth=ComputeFK(js(1,i),js(2,i),js(3,i),js(4,i));
+    DrawRobot(gth,0.05);
     title(t(i));
     drawnow;
 end

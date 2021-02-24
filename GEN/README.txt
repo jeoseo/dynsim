@@ -1,0 +1,1 @@
+Placeholder to let git commit an "empty" folder

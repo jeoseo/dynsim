@@ -65,9 +65,7 @@ zlim([-5 5]);
 view(30,30);
 
 for i=1:20:size(js,2) %specify framerate
-    %IMPORTANT: this line must change with DOF
-    gth=ComputeFK(js(1,i),js(2,i),js(3,i)); 
-    
+    gth=ComputeFK(js(1,i),js(2,i),js(3,i)); %TODO this line has to change with DOF
     DrawRobot(gth,0.2);
     title(t(i));
     drawnow;
