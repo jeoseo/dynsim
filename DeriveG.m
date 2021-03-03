@@ -12,5 +12,5 @@ function G=DeriveG(DOF,gth,gravity)
         G(i)=diff(P,th(i));
     end
     G=simplify(G);
-    matlabFunction(G,'file','GEN/ComputeG.m','vars',[th]);
+    matlabFunction(G,'file','GEN/ComputeG.m','vars',{th});
 end

@@ -20,12 +20,12 @@ function J=DeriveBodyJacobians(DOF,q,w,g)
                 ad=ad*ComputeExpn(twists(:,j2),th(j2));
             end
             ad=ad*g(:,:,k,2);
-            J(:,j,k)=inv(ComputeAdjoint(ad))*twists(:,j);
+            J(:,j,k)=ComputeInvAdjoint(ad)*twists(:,j);
             c=c+1;
         end
     end
     J=simplify(J);
-    matlabFunction(J,'file','GEN/ComputeBodyJacobians.m','vars',[th]);
+    matlabFunction(J,'file','GEN/ComputeBodyJacobians.m','vars',{th});
 end
 
 

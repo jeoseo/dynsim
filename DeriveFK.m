@@ -19,6 +19,6 @@ function gth=DeriveFK(DOF,g0,w,q)
     end
     gth=simplify(gth);
     
-    matlabFunction(gth,'file','GEN/ComputeFK.m','vars',[th]);
+    matlabFunction(gth,'file','GEN/ComputeFK.m','vars',{th});
     
 end

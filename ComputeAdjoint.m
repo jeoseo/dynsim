@@ -1,5 +1,5 @@
 %Computes the 6x6 adjoint transform for some 4x4 homongenous transform
-%[R 0; phat*R R] for some T=[R p;0 1], where R is the rotation matrix, p is
+%[R phat*R; 0 R] for some T=[R p;0 1], where R is the rotation matrix, p is
 %the translation vector
 
 function adj=ComputeAdjoint(T)

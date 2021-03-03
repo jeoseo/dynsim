@@ -16,5 +16,5 @@ function C=DeriveC(D,DOF)
         end
     end
     C=simplify(C);
-    matlabFunction(C,'file','GEN/ComputeC.m','vars',[th,thd]);
+    matlabFunction(C,'file','GEN/ComputeC.m','vars',[{th},{thd}]);
 end

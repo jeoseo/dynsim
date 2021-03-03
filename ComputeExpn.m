@@ -1,5 +1,5 @@
 %Computes the 4x4 transformation matrix given a joint value and twist
-%w is the joint twist (6x1, linear then angular)
+%w is the joint twist coordinate (6x1, linear then angular)
 %q is the joint value (scalar)
 function exp=ComputeExpn(w,q)
     w1=w(1:3); %linear

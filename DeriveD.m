@@ -17,5 +17,5 @@ function D=DeriveD(J, I,m, DOF)
         D=D+J(:,:,i)'*M*J(:,:,i);
     end
     D=simplify(D);
-    matlabFunction(D,'file','GEN/ComputeD.m','vars',[th]);
+    matlabFunction(D,'file','GEN/ComputeD.m','vars',{th});
 end
