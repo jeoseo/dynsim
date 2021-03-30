@@ -5,7 +5,7 @@
 %computed for the same link (for example, the COM and the end of the link
 %are two poses corresponding to the same link).
 %Outputs 4x4xDOFxk symbolic matrix of homogenous transforms in terms of th
-function gth=DeriveFK(DOF,g0,w,q)
+function gth=DeriveFK(DOF,g0,w,q, derive)
     th=sym('th',[DOF,1]);
     twists=ComputeJointTwist(w,q);
     gth=zeros(4,4,DOF,size(g0,4));
@@ -19,6 +19,8 @@ function gth=DeriveFK(DOF,g0,w,q)
     end
     gth=simplify(gth);
     
-    matlabFunction(gth,'file','GEN/ComputeFK.m','vars',{th});
+    if (derive == true) 
+        matlabFunction(gth,'file','GEN/ComputeFK.m','vars',{th});
+    end
     
 end

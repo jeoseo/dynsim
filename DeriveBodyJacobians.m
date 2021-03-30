@@ -6,8 +6,9 @@
 %this will return a 6 by DOF by DOF matrix, where each layer is a 6x3 Jacobian
 %for each link's COM expressed in the body frame
 
-function J=DeriveBodyJacobians(DOF,q,w,g)
+function J=DeriveBodyJacobians(DOF,q,w,g,derive)
     th= sym('th',[DOF,1]); %the joint values
+    assume(th,'real');
     twists=ComputeJointTwist(w,q);
     
     J=zeros([6,DOF,DOF]);
@@ -24,8 +25,10 @@ function J=DeriveBodyJacobians(DOF,q,w,g)
             c=c+1;
         end
     end
-    J=simplify(J);
-    matlabFunction(J,'file','GEN/ComputeBodyJacobians.m','vars',{th});
+    J=simplify(expand(J));
+    if (derive == true) 
+        matlabFunction(J,'file','GEN/ComputeBodyJacobians.m','vars',{th});
+    end
 end
 
 

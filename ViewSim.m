@@ -10,11 +10,11 @@ function ViewSim(t,js, record)
     set(gcf,'position',[0 0 1400 900]);
     grid on;
     axis equal;
-    xlim([-1 1]);
-    ylim([-1 1]);
-    zlim([-1 1]);
+    xlim([-3 3]);
+    ylim([-3 3]);
+    zlim([-3 3]);
     view(30,30);
-    for i=1:20:size(js,2) %specify framerate
+    for i=1:5:size(js,2) 
         gth=ComputeFK(js(1:end/2,i));
         DrawRobot(gth,0.04);
         title(t(i));

@@ -1,47 +1,48 @@
 %simulates the two link planar robot from part 4 of the notes manipulator
 %see SimMLS.m for more detail on the executables
-function [t,js]=SimTLP()
-    clear all;
-    close all;
+clear all;
+close all;
 
-    addpath(genpath('GEN'));
-    %Define some physical properties of the robot
-    DOF=2;
-    I(:,:,1)=eye(3);
-    I(:,:,2)=eye(3);
-    m=[1;1];
-    tau=[0;0];
-    g(:,:,1,1)=[1 0 0 2; 0 1 0 0;0 0 1 0;0 0 0 1];%the link end home frames
-    g(:,:,2,1)=[1 0 0 4; 0 1 0 0;0 0 1 0;0 0 0 1];
-    g(:,:,1,2)=[1 0 0 1; 0 1 0 0;0 0 1 0;0 0 0 1]; %the COM home frames
-    g(:,:,2,2)=[1 0 0 3; 0 1 0 0;0 0 1 0;0 0 0 1];
-    w=[0 0 1;0 0 1]';
-    q=[0 0 0;2 0 0]';
-    gravity=[0;-9.81;0];
+addpath(genpath('GEN'));
+%Define some physical properties of the robot
+DOF=2;
+I(:,:,1)=3*eye(3);
+I(:,:,2)=2*eye(3);
+m=[1;1];
+g(:,:,1,1)=[1 0 0 2; 0 1 0 0;0 0 1 0;0 0 0 1];%the link end home frames
+g(:,:,2,1)=[1 0 0 4; 0 1 0 0;0 0 1 0;0 0 0 1];
+g(:,:,1,2)=[1 0 0 1; 0 1 0 0;0 0 1 0;0 0 0 1]; %the COM home frames
+g(:,:,2,2)=[1 0 0 3; 0 1 0 0;0 0 1 0;0 0 0 1];
+w=[0 0 1;0 0 1]';
+q=[0 0 0;2 0 0]';
+gravity=[0;-9.81;0];
+fc=[0;0];
+fv=[6;10];
+derive=true;
 
-    J=DeriveBodyJacobians(DOF,q,w,g);
-    D=DeriveD(J, I,m, DOF);
-    C=DeriveC(D,DOF);
-    gth=DeriveFK(DOF,g,w,q);
-    G=DeriveG(DOF,gth,gravity);
-    EOM=DeriveEOM(D,C,G,DOF);
+J=DeriveBodyJacobians(DOF,q,w,g,derive);
+D=DeriveD(J, I,m, DOF,derive);
+C=DeriveC(D,DOF,derive);
+gth=DeriveFK(DOF,g,w,q,derive);
+N=DeriveN(DOF,gth,gravity,fc,fv,derive);
+eqom=DeriveEOM(D,C,N,DOF,derive);
 
-    T0=0; %start of sim
-    Tf=10; %end of sim
-    dT=0.1; %timestep for changing torque (tau)
-    T=T0:dT:Tf; %timesteps for changing torque
-    t=0; %stores all actual time steps run
-    js=[]; %joint state (position and velocity)
+Tf=10; %end of sim (start of sim should always be t=0)
+dt=0.01; %timestep
+t=0:dt:Tf; %timesteps for changing torque
+dt=0.01; %time step for recording joint state
+js=[]; %joint state (position and velocity)
+js(:,1)=zeros(DOF*2,1);
+tau=10*[sin(0:0.01:10);cos(0:0.01:10)];
 
-    js(:,1)=zeros(DOF*2,1);
-    for i=1:(size(T,2)-1)
-        ODEoptions=odeset('RelTol',1e-6,'InitialStep',0.01);
-        [t_temp,js_temp]=ode45(@ComputeEOM,[T(i) T(i+1)],js(:,end),ODEoptions,tau);
+func_h=@(t,js)ComputeEOM(t,js,tau(:,1+floor(t/dt)));
+ODEoptions=odeset('RelTol',1e-6);
+for i=1:(size(t,2)-1)
+    [t_temp,js_temp]=ode45(func_h,[t(i),t(i+1)],js(:,end),ODEoptions);
 
-        t=[t  t_temp'];
-        js=[js js_temp'];
-
-    end
+    js=[js js_temp(end,:)']; %only last element is recorded
+    %plug in js into eqom and compare with next desired js to find next tau
 end
+
 
  

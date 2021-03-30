@@ -1,7 +1,7 @@
 %The Coriolis matrix
 %J is the symbolic variable for the Jacobians for the COM's of all links
 %DOF can be found from J but exists separately for readability
-function C=DeriveC(D,DOF)
+function C=DeriveC(D,DOF,derive)
     C=zeros(DOF,DOF);
     C=sym(C);
     th=sym('th',[DOF,1]);
@@ -15,6 +15,8 @@ function C=DeriveC(D,DOF)
             end
         end
     end
-    C=simplify(C);
-    matlabFunction(C,'file','GEN/ComputeC.m','vars',[{th},{thd}]);
+    C=simplify(expand(C));
+    if (derive == true) 
+        matlabFunction(C,'file','GEN/ComputeC.m','vars',[{th},{thd}]);
+    end
 end
