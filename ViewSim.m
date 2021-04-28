@@ -10,9 +10,9 @@ function ViewSim(t,js, record)
     set(gcf,'position',[0 0 1400 900]);
     grid on;
     axis equal;
-    xlim([-3 3]);
-    ylim([-3 3]);
-    zlim([-3 3]);
+    xlim([-1.2 1.2]);
+    ylim([-1.2 1.2]);
+    zlim([-1.2 1.2]);
     view(30,30);
     for i=1:5:size(js,2) 
         gth=ComputeFK(js(1:end/2,i));

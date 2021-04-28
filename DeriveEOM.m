@@ -1,9 +1,8 @@
 % This function gives the dynamics of the robot given the various matrices
 % D, C, N
-% th is a state vector having the joint angles and joint rates. This
-% function returns the time derivative of the state vector (thd) that is then
+% th is a state vector having the joint angles and joint rates.
+% eqom returns the time derivative of the state vector (thd) that is then
 % used by ODE45 to integrate the dynamic equations
-
 function eqom=DeriveEOM(D,C,N,DOF,derive)
      syms t
      thd=sym('thd',[DOF 1]);

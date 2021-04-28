@@ -9,9 +9,24 @@ It=sym('It',[6,DOF]);
 assume(It,'real');
 I=sym(I);
 I(:,:,1)=[It(1,1),It(2,1),It(3,1);It(2,1),It(4,1),It(5,1);It(3,1),It(5,1),It(6,1)];
-I(:,:,2)=diag([It(1,2),It(2,2),It(3,2)]);
-I(:,:,3)=diag([It(1,3),It(2,3),It(3,3)]);
+I(:,:,2)=[1,It(2,2),It(3,2);It(2,2),It(4,2),It(5,2);It(3,2),It(5,2),It(6,2)];
+I(:,:,3)=[1,It(2,3),It(3,3);It(2,3),It(4,3),It(5,3);It(3,3),It(5,3),It(6,3)];
 fv=sym('fv',[DOF,1]); %viscous friction unknown
+fc=sym('fc',[DOF,1]);
+m=sym('m',[DOF,1]);
+r=sym('r',[DOF,1]);
+assume(fc,'real');
+assume(m,'real');
+assume(r,'real');
+g=sym(g);
+g(:,:,1,1)=[1 0 0 0; 0 1 0 0;0 0 1 l(1);0 0 0 1];%the link end home frames
+g(:,:,2,1)=[1 0 0 0; 0 1 0 l(2);0 0 1 l(1);0 0 0 1];
+g(:,:,3,1)=[1 0 0 0; 0 1 0 l(2)+l(3);0 0 1 l(1);0 0 0 1];
+g(:,:,1,2)=[1 0 0 0; 0 1 0 0;0 0 1 r(1);0 0 0 1]; %the COM home frames
+g(:,:,2,2)=[1 0 0 0; 0 1 0 r(2);0 0 1 l(1);0 0 0 1];
+g(:,:,3,2)=[1 0 0 0; 0 1 0 l(2)+r(3);0 0 1 l(1);0 0 0 1];
+
+
 derive=false;
 
 th=sym('th',[DOF,1]);
@@ -31,7 +46,7 @@ eqom=simplify(expand(eqom));
 
 coeffCell=cell(1,DOF);
 for i=1:DOF
-    [coeff,term]=coeffs(eqom(i),{It(:);fv});
+    [coeff,term]=coeffs(eqom(i),{It(:);fv;fc;m;r});
     term=arrayfun(@char, term,'uniform',0); %turn from symbolic to cell
     coeff=arrayfun(@char,coeff,'uniform',0);
     coeffCell{i}=containers.Map(term,coeff);
@@ -59,8 +74,8 @@ for i=1:DOF
         end
     end
 end
-F=[];
-tau_ext=[];%tau with the elements matching phiBig
+F=[]; %phi stacked vertically such that we can perform a least squares
+tau_ext=[];%tau with the elements matching F
 for i=3:10:size(js,2)-2 %trimmed a little so we can get thdd,also downsampled
     phiSub=phi;
     for j=1:DOF
@@ -75,9 +90,11 @@ for i=3:10:size(js,2)-2 %trimmed a little so we can get thdd,also downsampled
 end
 %We perform least mean squares, but we exclude the first column of F as it
 %should correspond to 1, the constant term every time.
-parameter_val=lsqr(F(:,2:end),tau_ext-F(:,1));
+%parameter_val=lsqr(F,tau_ext);
+parameter_val=pinv(F(:,2:end))*(tau_ext-F(:,1));
 parameter_val=[1;parameter_val]; %add the 1 back in to match with the keyTerms
 inertial_parameter_map=containers.Map(allKeyTerms,parameter_val);
+
 
 
 

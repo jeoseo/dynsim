@@ -1,11 +1,10 @@
-%We need the Jacobians to the center of mass of each link: this is best
+%We need the Jacobians to the end of each link: this is best
 %done using POE. 
 
 %COM is defined using xyz translation from the frame that the link is
 %attached to
 %this will return a 6 by DOF by DOF matrix, where each layer is a 6x3 Jacobian
-%for each link's COM expressed in the body frame
-
+%for each link's end frame
 function J=DeriveBodyJacobians(DOF,q,w,g,derive)
     th= sym('th',[DOF,1]); %the joint values
     assume(th,'real');
@@ -20,7 +19,7 @@ function J=DeriveBodyJacobians(DOF,q,w,g,derive)
             for j2=j:k %for finding the requisite adjoint transform
                 ad=ad*ComputeExpn(twists(:,j2),th(j2));
             end
-            ad=ad*g(:,:,k,2);
+            ad=ad*g(:,:,k,1);
             J(:,j,k)=ComputeInvAdjoint(ad)*twists(:,j);
             c=c+1;
         end
