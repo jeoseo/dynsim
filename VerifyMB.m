@@ -25,12 +25,21 @@ f1=figure;
 hold on;
 plot(t(3:end-2),tau(1,:));
 plot(t(3:end-2),new_tau(1,:));
+plot(t(3:end-2),tau(2,:));
+plot(t(3:end-2),new_tau(2,:));
+plot(t(3:end-2),tau(3,:));
+plot(t(3:end-2),new_tau(3,:));
+plot(t(3:end-2),tau(4,:));
+plot(t(3:end-2),new_tau(4,:));
 diff_tau=new_tau-tau;
 LMS=sqrt(sum(diff_tau(:).^2)/size(diff_tau(:),1));
 title('Torque Comparison for Excitation Trajectory')
 xlabel('Time (s)')
 ylabel('Torque (Nm)')
-legend('Real Torque of Joint 1','Predicted Torque of Joint 1')
+legend('Real Torque of Joint 1','Predicted Torque of Joint 1',...
+    'Real Torque of Joint 2','Predicted Torque of Joint 2',...
+    'Real Torque of Joint 3','Predicted Torque of Joint 3',...
+    'Real Torque of Joint 4','Predicted Torque of Joint 4');
 
 
 %The 2nd trajectory, theoretically should be a lot worse
@@ -39,12 +48,7 @@ legend('Real Torque of Joint 1','Predicted Torque of Joint 1')
 rng default;
 x=rand(1,16)-0.5;
 t=0:dt:Tf;
-js2=[x(1)+x(2)*sin(.2*pi*t)+x(3)*sin(.4*pi*t)+x(4)*sin(.6*pi*t);
-        x(5)+x(6)*sin(.2*pi*t)+x(7)*sin(.4*pi*t)+x(8)*sin(.6*pi*t);
-        x(9)+x(10)*sin(.2*pi*t)+x(11)*sin(.4*pi*t)+x(12)*sin(.6*pi*t);
-        x(13)+x(14)*sin(.2*pi*t)+x(15)*sin(.4*pi*t)+x(16)*sin(.6*pi*t)];
-js2=[js2(:,2:end-1);(js2(:,3:end)-js2(:,1:end-2))/(2*dt)];
-js2=[js2(:,2:end-1);(js2(5:8,3:end)-js2(5:8,1:end-2))/(2*dt)];
+[t_out,js2]=ComputeJs(t,x);
 
 %Compute predicted torque for new trajectory
 new_tau2=[];
@@ -70,10 +74,19 @@ f2=figure;
 hold on;
 plot(t,tau2(1,:));
 plot(t,new_tau2(1,:));
+plot(t,tau2(2,:));
+plot(t,new_tau2(2,:));
+plot(t,tau2(3,:));
+plot(t,new_tau2(3,:));
+plot(t,tau2(4,:));
+plot(t,new_tau2(4,:));
 diff_tau2=new_tau2-tau2;
 LMS2=sqrt(sum(diff_tau2(:).^2)/size(diff_tau2(:),1));
 title('Torque Comparison for Random Trajectory')
 xlabel('Time (s)')
 ylabel('Torque (Nm)')
-legend('Real Torque of Joint 1','Predicted Torque of Joint 1')
+legend('Real Torque of Joint 1','Predicted Torque of Joint 1',...
+    'Real Torque of Joint 2','Predicted Torque of Joint 2',...
+    'Real Torque of Joint 3','Predicted Torque of Joint 3',...
+    'Real Torque of Joint 4','Predicted Torque of Joint 4');
 
