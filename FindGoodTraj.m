@@ -5,7 +5,7 @@ x0=[    0.0018    0.0276   -0.1285   -0.0151    0.9794   -0.1463    0.1335   -0.
 
 options = optimoptions('fmincon','Display','iter','Algorithm','active-set','MaxIterations',500, 'StepTolerance', 1e-10);
 limit=[.25,.25,.25,.25,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5];
-problem = createOptimProblem('fmincon','x0',x0,'objective',@ComputeDOptimal,'lb', -limit,'ub',limit,'nonlcon',@constr,'options',options);
+problem = createOptimProblem('fmincon','x0',x0,'objective',@ComputeDOptimal,'lb', -10*ones(1,16),'ub',10*ones(1,16),'nonlcon',@constr,'options',options);
 x = run(gs,problem);
 %x= fmincon(@ComputeDetF, x0, [], [], [], [], -10*ones(1,16),10*ones(1,16),@constr,options);
 
@@ -23,10 +23,9 @@ function minimize=ComputeDOptimal(x)
     indcolF=[ 1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    20    21    22    23    24    25    26    27  29   30     31    32    33    34    35    36    37];
 
     Fshrunk=F(:,indcolF);
-    cov_inv=Fshrunk'*Fshrunk;
-    [U,S,V]=svd(cov_inv);
-    minimize=-1*min(diag(S));
-    
+    cov=(Fshrunk'*Fshrunk);
+    [U,S,V]=svd(cov);
+    minimize=max(diag(S));
 end
 
 function [c, ceq] = constr(x)

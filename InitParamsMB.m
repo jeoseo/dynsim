@@ -10,7 +10,7 @@ m=[8;4;4;2];
 r=[0.01, 0.01,0.01,0.01;
    -0.1 -0.2 -0.15 -0.05;
    -0.1 0.02 -0.02 0.02];
-g(:,:,1,1)=[1 0 0 0; 0 1 0 .185;0 0 1 .197;0 0 0 1];%the link end home frames
+g(:,:,1,1)=[1 0 0 0; 0 1 0 .185;0 0 1 .197;0 0 0 1];%the link end home config frames
 g(:,:,2,1)=[1 0 0 0; 0 1 0 .535;0 0 1 .197;0 0 0 1];
 g(:,:,3,1)=[1 0 0 0; 0 1 0 .885;0 0 1 .197;0 0 0 1];
 g(:,:,4,1)=[1 0 0 0; 0 1 0 1.025;0 0 1 .197;0 0 0 1];
@@ -33,6 +33,8 @@ t=0:dt:Tf; %timesteps for changing torque
 %hard coded joint trajectory
    x=[ 0.2472   -0.2279    0.0221   -0.2500    0.5000   -0.1847    0.3476    0.2043   -0.2643   -0.0107    0.1946   -0.0205   -0.1544   -0.0211    0.3634    0.2321];
 
+
 [t,js]=ComputeJs(t,x);
+%js=randn(size(js,1),size(js,2)); %for random trajectory
 pos_sigma=0.1; %std deviation for white noise on position data
 tau_sigma=1; %std devation for white noise on torque data
