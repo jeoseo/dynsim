@@ -6,3 +6,4 @@ InitBadParamsMB(); %I plug in what I "should" know about the robot, and represen
 IdentifyMB(); %I refactor the dynamics equation to solve for the inertial parameters with LMS and the js, tau vectors
 VerifyMB(); %I plug the inertial parameters back into my dynamics equation, and resimulate the robot with the same trajectory
             %finding some torque tau, and compare it to the original
+CompareParams(); %A second verification script: produces a table comparing the original and identified parameters (only possible in simulation)

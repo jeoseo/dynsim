@@ -52,6 +52,8 @@ matlabFunction(phi,'file','GEN/ComputePhiMB.m','vars',[{th},{thd},{thdd}]);
 F=[]; %phi stacked vertically such that we can perform a least squares
 tau_ext=[];%tau with the elements matching F
 [t_out,filt_js]=ComputeFilteredJs(t,js,DOF,pos_sigma);
+%t_out=t;
+%filt_js=js;
 offset=(size(t,2)-size(t_out,2))/2; %by filtering, we often have to truncate the signal
 for i=1:size(filt_js,2)
     phiSub=double(ComputePhiMB(filt_js(1:DOF,i),filt_js(1+DOF:2*DOF,i),filt_js(1+2*DOF:3*DOF,i)));
@@ -61,10 +63,13 @@ for i=1:size(filt_js,2)
     F=[F;phiSub]; %We stack our phi's together to do least mean squares
 end
 %found by row reducing F
-indcolF=[ 1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    20    21    22    23    24    25    26    27  29   30     31    32    33    34    35    36    37];
+[~,indcolF]=rref(F);
 Fshrunk=F(:,indcolF);
 parameter_val_shrunk=pinv(Fshrunk)*tau_ext;
-parameter_val=[parameter_val_shrunk(1:16);0;0;0;parameter_val_shrunk(17:24);0;parameter_val_shrunk(25:end)]; %hardcoded
+parameter_val=zeros(size(F,2),1);
+for i=1:size(Fshrunk,2)
+    parameter_val(indcolF(i))=parameter_val_shrunk(i); %repadding zeros
+end
 
 %imp=inertial parameter map
 imp=containers.Map(allKeyTerms,parameter_val);

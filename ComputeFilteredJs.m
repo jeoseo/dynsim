@@ -34,8 +34,14 @@ function [t_out,filt_js]=ComputeFilteredJs(t,js, DOF,sigma)
     for i=1:DOF
         noise_js=sigma.*randn(1,size(js,2))+js(i,:); %add the noise
         fft1=fft(noise_js);
-        fft1(5:end)=0;%remove any frequencies that shouldn't exist
-        fft1(2:4)=fft1(2:4)*2; %*2 b/c of the double sided spectrum (see https://www.mathworks.com/help/matlab/ref/fft.html)
+%         fft1(3)=0;
+%         fft1(5)=0;
+%         fft1(7:end)=0;%remove any frequencies that shouldn't exist
+%         fft1(2)=fft1(2)*2; %*2 b/c of the double sided spectrum (see https://www.mathworks.com/help/matlab/ref/fft.html)
+%         fft1(4)=fft1(4)*2;
+%         fft1(6)=fft1(6)*2;
+        fft1(7:end)=0;
+        fft1(2:6)=fft1(2:6)*2;
         filt_js(i,:)=real(ifft(fft1));
     end
     for i=1:DOF %taking the derivatives

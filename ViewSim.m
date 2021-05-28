@@ -11,7 +11,7 @@ function ViewSim(t,js, record)
     grid on;
     axis equal;
     xlim([-1.2 1.2]);
-    ylim([0 1.2]);
+    ylim([-1.2 1.2]);
     zlim([0 1.2]);
     view(30,30);
     for i=1:5:size(js,2) 

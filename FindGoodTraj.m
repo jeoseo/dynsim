@@ -1,13 +1,22 @@
 %requires phi, get this from FullMB
-rng default % For reproducibility
-gs = GlobalSearch('NumTrialPoints',1000);
-x0=[    0.0018    0.0276   -0.1285   -0.0151    0.9794   -0.1463    0.1335   -0.4630   -0.7548   -0.7416   -0.1347   -0.2028    0.1428   -1.0000   -0.7437    0.0067];
+rng(12345);
+addpath(genpath('GEN')); %Add path for generated functions
 
-options = optimoptions('fmincon','Display','iter','Algorithm','active-set','MaxIterations',500, 'StepTolerance', 1e-10);
-limit=[.25,.25,.25,.25,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5];
-problem = createOptimProblem('fmincon','x0',x0,'objective',@ComputeDOptimal,'lb', -10*ones(1,16),'ub',10*ones(1,16),'nonlcon',@constr,'options',options);
-x = run(gs,problem);
+%GlobalSearch except this doesn't work well
+% gs = GlobalSearch('MaxTime',1000);
+ x0=zeros(24,1);
+% options = optimoptions('fmincon','Display','iter');
+% problem = createOptimProblem('fmincon','x0',x0,'objective',@ComputeDOptimal,'lb', -.5*ones(24,1),'ub',.5*ones(24,1),'nonlcon',@constr,'options',options);
+% x = run(gs,problem);
 %x= fmincon(@ComputeDetF, x0, [], [], [], [], -10*ones(1,16),10*ones(1,16),@constr,options);
+options=optimoptions('surrogateopt','Display','iter','MaxTime',1000,'UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',24*1000);
+
+x=surrogateopt(@combine,-1*ones(24,1),1.1*ones(24,1),options);
+
+function f=combine(x)
+    f.Fval=ComputeDOptimal(x);
+    f.Ineq=constr(x);
+end
 
 function minimize=ComputeDOptimal(x)
     Tf=10; %end of sim (start of sim should always be t=0)
@@ -19,16 +28,20 @@ function minimize=ComputeDOptimal(x)
     for i=1:10:size(js,2)
         F=[F;ComputePhiMB(js(1:4,i),js(5:8,i),js(9:12,i))]; %We stack our phi's together to do least mean squares
     end
-    %hacky way to get rank to be full
-    indcolF=[ 1     2     3     4     5     6     7     8     9    10    11    12    13    14    15    16    20    21    22    23    24    25    26    27  29   30     31    32    33    34    35    36    37];
-
-    Fshrunk=F(:,indcolF);
-    cov=(Fshrunk'*Fshrunk);
-    [U,S,V]=svd(cov);
-    minimize=max(diag(S));
+    [~,indcolF]=rref(F);
+    if size(indcolF,2)==33
+        Fshrunk=F(:,indcolF);
+        %minimize=max(diag(inv(Fshrunk'*Fshrunk)));
+        minimize=-log(det(Fshrunk'*Fshrunk));
+        %[U,S,V]=svd(Fshrunk'*Fshrunk);
+        %minimize=log(max(diag(S));
+    else
+        minimize=1000;
+    end
+    
 end
 
-function [c, ceq] = constr(x)
+function c = constr(x)
     Tf=10; %end of sim (start of sim should always be t=0)
     dt=.01; %time step for recording joint state
     t=0:dt:Tf; %timesteps for changing torque
@@ -51,5 +64,14 @@ function [c, ceq] = constr(x)
    c(10)=max(abs(js(6,:)))-.73;
    c(11)=max(abs(js(7,:)))-1.22;
    c(12)=max(abs(js(8,:)))-1.22;
-   ceq = [];
+   
+   %abs torque bounds
+   
+   tau_lim=max(abs(ComputeEOM2(js(1:4,:),js(5:8,:),js(9:12,:))),[],2);
+   c(13)=tau_lim(1)-40; 
+   c(14)=tau_lim(2)-4.167*40;
+   c(15)=tau_lim(3)-2.5*40;
+   c(16)=tau_lim(4)-2.5*40;
+   
 end
+

@@ -16,12 +16,16 @@ I(:,:,3)=[1 0 0; 0 3 0; 0 0 5];
 m=[1;1.3;1.6]; %mass of each link
 r=[1;1.5;1];%used here to define g, is the distance to COM from each link
 l=[2;2;3];%used to define g, is the length of each link
+
+
 %g is a 4x4xDOFxk matrix. Each 4x4 is a homogenous transform of a frame 
 %in the home configuration
 %The 3rd dimension defines which link the frame corresponds to
-%The 4th dimenstion defines which frame of the link it corresponds to
+%The 4th dimension defines which frame of the link it corresponds to
 %if k=1 it is for the link's tip frame, k=2 for the COM, k>=3 for any
 %auxiliary frames
+g=zeros(4,4,3,2);
+g=sym(g);
 g(:,:,1,1)=[1 0 0 0; 0 1 0 0;0 0 1 l(1);0 0 0 1];%the link end home frames
 g(:,:,2,1)=[1 0 0 0; 0 1 0 l(2);0 0 1 l(1);0 0 0 1];
 g(:,:,3,1)=[1 0 0 0; 0 1 0 l(2)+l(3);0 0 1 l(1);0 0 0 1];
@@ -32,7 +36,7 @@ w=[0 0 1;-1 0 0;-1 0 0]'; %Joint twist direction in the base frame
 q=[0 0 0;0 0 l(1);0 l(2) l(1)]'; %Location of the twist in the base frame
 gravity=[0;0;-9.81];%direction and magnitude of gravity
 fc=[0;0;0]; %coulomb friction
-fv=[1;2;3]; %viscous friction
+fv=[0;0;0]; %viscous friction
 derive=true; %want to generate compute functions
 tau=10*[sin(0:0.01:10);cos(0:0.01:10);sin(0:0.01:10)]; %some sinusoids for tau
 %----------------------------------------------------------------------
@@ -42,7 +46,7 @@ J=DeriveBodyJacobians(DOF,q,w,g,derive);
 D=DeriveD(J, I,m, DOF,derive);
 C=DeriveC(D,DOF,derive);
 gth=DeriveFK(DOF,g,w,q,derive);
-N=DeriveN(DOF,gth,gravity,fc,fv,derive);
+N=DeriveN(DOF,gth,gravity,fc,fv,m,derive);
 eqom=DeriveEOM(D,C,N,DOF,derive);
 
 
@@ -65,9 +69,7 @@ for i=1:(size(t,2)-1)
 end
 
 %Alternatively, we can hardcode the jointstates (probably postition and
-%then just take derivatives for vel and acc), eqom is tau=D*thdd+C*thd+N 
-
-
-js=noise_sigma.*randn(size(js,1),size(js,2))+js; %add gaussian noise
-
+%then just take derivatives for vel and acc), eqom is tau=D*thdd+C*thd+N  
+% js=noise_sigma.*randn(size(js,1),size(js,2))+js; %add gaussian noise
+% 
 

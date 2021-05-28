@@ -46,8 +46,8 @@ L.Location='northeastoutside';
 %The 2nd trajectory, theoretically should be a lot worse
 %For now, just to a random trajectory (may not be possible, but should
 %still be accurate)
-rng default;
-x=rand(1,16)-0.5;
+%This one actually follows the joint constraints
+x=[  -0.9210   -0.2432   -0.0434    0.0570    0.0985    0.0440    0.9221   -0.2285   -0.3103   -0.0361    0.0271   -0.0492   -0.5761   -0.0267   -0.2418   -0.4107    0.1178   -0.0320    0.3735   -0.6055   -0.0584   -0.2810    0.2246    0.0590];
 t=0:dt:Tf;
 [t_out,js2]=ComputeJs(t,x);
 
@@ -91,3 +91,5 @@ L=legend('Real Torque of Joint 1','Predicted Torque of Joint 1',...
     'Real Torque of Joint 3','Predicted Torque of Joint 3',...
     'Real Torque of Joint 4','Predicted Torque of Joint 4');
 L.Location='northeastoutside';
+
+

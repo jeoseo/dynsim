@@ -24,7 +24,7 @@ J=DeriveBodyJacobians(DOF,q,w,g,derive);
 D=DeriveD(J, I,m, DOF,derive);
 C=DeriveC(D,DOF,derive);
 gth=DeriveFK(DOF,g,w,q,derive);
-N=DeriveN(DOF,gth,gravity,fc,fv,derive);
+N=DeriveN(DOF,gth,gravity,fc,fv,m,derive);
 eqom=DeriveEOM(D,C,N,DOF,derive);
 
 Tf=10; %end of sim (start of sim should always be t=0)

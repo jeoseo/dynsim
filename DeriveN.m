@@ -8,7 +8,7 @@ function N=DeriveN(DOF,gth,gravity,fc,fv,m,derive)
     N=sym(N);
     P=0;
     P=sym(P);
-    for i=1:DOF %Find 
+    for i=1:DOF 
         P=P-dot(gth(1:3,4,i,2),gravity)*m(i); %the translational vector for the COM of the ith link
     end
     for i=1:DOF

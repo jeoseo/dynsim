@@ -12,11 +12,14 @@ function D=DeriveD(J, I,m, DOF, derive)
         M(1,1)=m(i);
         M(2,2)=m(i);
         M(3,3)=m(i);
+%         M(4,4)=I(1,1,i);
+%         M(5,5)=I(2,2,i);
+%         M(6,6)=I(3,3,i);
         M(4:6,4:6)=I(:,:,i);
         D=D+J(:,:,i)'*M*J(:,:,i);
     end
     D=simplify(expand(D));
     if (derive == true) 
         matlabFunction(D,'file','GEN/ComputeD.m','vars',{th});
-    end;
+    end
 end

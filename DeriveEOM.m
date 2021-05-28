@@ -8,8 +8,9 @@ function eqom=DeriveEOM(D,C,N,DOF,derive)
      thd=sym('thd',[DOF 1]);
      th=sym('th',[DOF 1]);
      tau=sym('tau',[DOF 1]);
+     D=simplify(D);
      eqom=[thd;inv(D)*(tau-C*thd-N)];
-     eqom=simplify(expand(eqom));
+     %eqom=simplify(expand(eqom));
      joint_state=[th;thd];
      if (derive == true) 
          matlabFunction(eqom,'file','GEN/ComputeEOM.m','vars',[{t},{joint_state},{tau}]);
