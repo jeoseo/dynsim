@@ -4,7 +4,7 @@
 %COM is defined using xyz translation from the frame that the link is
 %attached to
 %this will return a 6 by DOF by DOF matrix, where each layer is a 6x3 Jacobian
-%for each link's end frame
+%for each link's origin frame
 function J=DeriveBodyJacobians(DOF,q,w,g,derive)
     th= sym('th',[DOF,1]); %the joint values
     assume(th,'real');
@@ -19,7 +19,9 @@ function J=DeriveBodyJacobians(DOF,q,w,g,derive)
             for j2=j:k %for finding the requisite adjoint transform
                 ad=ad*ComputeExpn(twists(:,j2),th(j2));
             end
-            ad=ad*g(:,:,k,1);
+            if k>1 %multiple by the identity if k==1
+                ad=ad*g(:,:,k-1,1);
+            end
             J(:,j,k)=ComputeInvAdjoint(ad)*twists(:,j);
             c=c+1;
         end

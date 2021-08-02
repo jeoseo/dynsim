@@ -26,22 +26,26 @@
 %      t_out=t_out(1+1+n:end-n-1);
 %  end
 
-function [t_out,filt_js]=ComputeFilteredJs(t,js, DOF,sigma)
+function [t_out,filt_js]=ComputeFilteredJs(t,js, DOF)
    %showing that we can rederive the input function even with noise...
    %not sure if this is usable in real life as the noise not just going to
    %be white/gaussian
-    dt=t(2)-t(1);
+   
+    %assume the signal has constant time step
+    dt=(t(end)-t(1))/size(t,2);
     for i=1:DOF
-        noise_js=sigma.*randn(1,size(js,2))+js(i,:); %add the noise
-        fft1=fft(noise_js);
-%         fft1(3)=0;
-%         fft1(5)=0;
-%         fft1(7:end)=0;%remove any frequencies that shouldn't exist
-%         fft1(2)=fft1(2)*2; %*2 b/c of the double sided spectrum (see https://www.mathworks.com/help/matlab/ref/fft.html)
-%         fft1(4)=fft1(4)*2;
-%         fft1(6)=fft1(6)*2;
-        fft1(7:end)=0;
-        fft1(2:6)=fft1(2:6)*2;
+        fft1=fft(js(i,:));
+        %Depending on the sample size and frequency, the discret fourier
+        %transform forms different boxes. Because of this, we find the last
+        %peak
+        max_fft=max(abs(fft1));
+        for j=20:-1:1
+            if abs(fft1(j))>max_fft*.01
+                break;
+            end
+        end
+        fft1(j+1:end)=0;
+        fft1(2:j)=fft1(2:j)*2;
         filt_js(i,:)=real(ifft(fft1));
     end
     for i=1:DOF %taking the derivatives

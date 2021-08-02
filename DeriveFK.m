@@ -4,8 +4,14 @@
 %g0 can have a 4th dimension k, which denotes the different frames to be
 %computed for the same link (for example, the COM and the end of the link
 %are two poses corresponding to the same link).
-%Outputs 4x4xDOFxk symbolic matrix of homogenous transforms in terms of th
-function gth=DeriveFK(DOF,g0,w,q, derive)
+%Outputs 4x4xDOFxk symbolic matrix of homogenous transforms
+%
+function gth=DeriveFK(DOF,g0,w,q, derive, varargin)
+    inputP=inputParser;
+    addOptional(inputP,'jointType',zeros(DOF,1));
+    %jointType tells us if the joint is revolute or continuum (0 or 1)
+    %ex: [0,0,0,0,1,1] for the manufacturing robot
+    parse(inputP,{DOF,g0,w,q, derive},varargin{:});
     th=sym('th',[DOF,1]);
     twists=ComputeJointTwist(w,q);
     gth=zeros(4,4,DOF,size(g0,4));

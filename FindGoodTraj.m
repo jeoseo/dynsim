@@ -1,18 +1,11 @@
 %requires phi, get this from FullMB
-rng(12345);
+rng(2);
 addpath(genpath('GEN')); %Add path for generated functions
 
-%GlobalSearch except this doesn't work well
-% gs = GlobalSearch('MaxTime',1000);
- x0=zeros(24,1);
-% options = optimoptions('fmincon','Display','iter');
-% problem = createOptimProblem('fmincon','x0',x0,'objective',@ComputeDOptimal,'lb', -.5*ones(24,1),'ub',.5*ones(24,1),'nonlcon',@constr,'options',options);
-% x = run(gs,problem);
-%x= fmincon(@ComputeDetF, x0, [], [], [], [], -10*ones(1,16),10*ones(1,16),@constr,options);
-options=optimoptions('surrogateopt','Display','iter','MaxTime',1000,'UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',24*1000);
 
-x=surrogateopt(@combine,-1*ones(24,1),1.1*ones(24,1),options);
-
+options=optimoptions('surrogateopt','CheckpointFile','checkpoint2.mat','Display','iter','UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',24*1000);
+[x_work,fval,exitflag,output]=surrogateopt(@combine,-.5*ones(24,1),.6*ones(24,1),options);
+%[x_work,fval,exitflag,output]=surrogateopt('checkpoint.mat',options);
 function f=combine(x)
     f.Fval=ComputeDOptimal(x);
     f.Ineq=constr(x);
@@ -29,10 +22,10 @@ function minimize=ComputeDOptimal(x)
         F=[F;ComputePhiMB(js(1:4,i),js(5:8,i),js(9:12,i))]; %We stack our phi's together to do least mean squares
     end
     [~,indcolF]=rref(F);
-    if size(indcolF,2)==33
+    if size(indcolF,2)==32
         Fshrunk=F(:,indcolF);
         %minimize=max(diag(inv(Fshrunk'*Fshrunk)));
-        minimize=-log(det(Fshrunk'*Fshrunk));
+        minimize=real(-log(det(Fshrunk'*Fshrunk)));
         %[U,S,V]=svd(Fshrunk'*Fshrunk);
         %minimize=log(max(diag(S));
     else
@@ -68,10 +61,10 @@ function c = constr(x)
    %abs torque bounds
    
    tau_lim=max(abs(ComputeEOM2(js(1:4,:),js(5:8,:),js(9:12,:))),[],2);
-   c(13)=tau_lim(1)-40; 
-   c(14)=tau_lim(2)-4.167*40;
-   c(15)=tau_lim(3)-2.5*40;
-   c(16)=tau_lim(4)-2.5*40;
+   c(13)=tau_lim(1)-30; 
+   c(14)=tau_lim(2)-4.167*30;
+   c(15)=tau_lim(3)-2.5*30;
+   c(16)=tau_lim(4)-2.5*30;
    
 end
 

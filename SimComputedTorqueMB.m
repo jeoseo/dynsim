@@ -8,12 +8,13 @@ kd=5;% random guess
 
 InitParamsMB();
 t=0:.01:10;%timestep is the same as always
-%x=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0]';
-x=randn(24,1); %simple for now
+%x=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
+x=randn(1,24)*.3; %simple for now
 [t,js_des]=ComputeJs(t,x);
 tau_ct=zeros(DOF,1);  %_ct because my namespace is cluttered....
 js_ct=zeros(2*DOF,1);
 js_control=zeros(2*DOF,1);
+js_nolin=zeros(2*DOF,1);
 
 derive=1;
 J=DeriveBodyJacobians(DOF,q,w,g,derive);
@@ -33,10 +34,12 @@ for i=1:(size(t,2)-1)
      
      
      
-     [t_temp,js_temp]=ode45(@ComputeEOM,[t(i),t(i+1)],js_ct(:,end),ODEoptions,tau_ct(:,end));
-     [t_temp,js_temp2]=ode45(@(t,js) [js(1+DOF:2*DOF);aq_control],[t(i),t(i+1)],js_control(:,end));
+     [~,js_temp]=ode45(@ComputeEOM,[t(i),t(i+1)],js_ct(:,end),ODEoptions,tau_ct(:,end));
+     [~,js_temp2]=ode45(@(t,js) [js(1+DOF:2*DOF);aq_control],[t(i),t(i+1)],js_control(:,end));
+     [~,js_temp3]=ode45(@ComputeEOM,[t(i),t(i+1)],js_nolin(:,end),ODEoptions,aq(:,end));
      js_ct=[js_ct js_temp(end,:)']; %only last element is recorded
      js_control=[js_control js_temp2(end,:)'];
+     js_nolin=[js_nolin js_temp3(end,:)'];
 end
  
 %Identified parameters
@@ -58,9 +61,11 @@ for i=size(allKeyTerms,2):-1:1 %backwards so we don't skip sub any m before m*r 
     D=subs(D,str2sym(allKeyTerms{i}),parameter_val(i));
     C=subs(C,str2sym(allKeyTerms{i}),parameter_val(i));
     N=subs(N,str2sym(allKeyTerms{i}),parameter_val(i));
+
 end
 derive=1;
-eom=DeriveEOM(D,C,N,DOF,1);
+%eom=DeriveEOM(D,C,N,DOF,1); We don't want this line because we want the
+%dynamics from the real parameters
 eom3=DeriveEOM3(D,C,N,DOF,1);
 tau_ct2=zeros(DOF,1);  %
 js_ct2=zeros(2*DOF,1);
@@ -82,10 +87,11 @@ for i=1:4
     plot(t,js_des(i,:));
     plot(t,js_control(i,:));
     plot(t,js_ct2(i,:));
-    title(strcat('Joint ',tostring(i),' Computed Torque Controller Trajectory'));
+    plot(t,js_nolin(i,:));
+    title(strcat('Joint ',string(i),' Computed Torque Controller Trajectory'));
     xlabel('Time (s)');
     ylabel('Position (rad)');
-    L=legend('CT with Real Parameters', 'PD control', 'Command', 'CT with ID Parameters');
+    L=legend('CT with Real Parameters', 'PD control', 'Command', 'CT with ID Parameters','No linearization');
     L.Location='northeastoutside';
 
 

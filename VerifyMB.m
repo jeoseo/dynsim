@@ -1,7 +1,6 @@
 %Here, we assume that we have our map of inertial parameters (imp)
 %and find the difference between our predicted and simulated torque on the
 %original trajectory as well as one other onw
-InitBadParamsMB();
 th=sym('th',[DOF,1]);
 thd=sym('thd',[DOF,1]);
 thdd=sym('thdd',[DOF,1]);
@@ -47,7 +46,7 @@ L.Location='northeastoutside';
 %For now, just to a random trajectory (may not be possible, but should
 %still be accurate)
 %This one actually follows the joint constraints
-x=[  -0.9210   -0.2432   -0.0434    0.0570    0.0985    0.0440    0.9221   -0.2285   -0.3103   -0.0361    0.0271   -0.0492   -0.5761   -0.0267   -0.2418   -0.4107    0.1178   -0.0320    0.3735   -0.6055   -0.0584   -0.2810    0.2246    0.0590];
+x=[-0.3070   -0.1687    0.0518    0.0637   -0.0832    0.0193    0.5276   -0.3280    0.0611   -0.1366    0.0376    0.1634   -0.5388 0.0528   -0.0911   -0.1833   -0.0892    0.2621    0.2700   -0.1716    0.0135   -0.0529    0.4046    0.0466];
 t=0:dt:Tf;
 [t_out,js2]=ComputeJs(t,x);
 
