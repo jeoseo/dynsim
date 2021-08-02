@@ -1,15 +1,13 @@
 %requires phi, get this from FullMB
 rng(25);
 addpath(genpath('GEN')); %Add path for generated functions
-addpath(genpath('rosbags'));
 InitParamsTTA(); %I plug in all known robot parameters
-[t,js,eff]=BagToMatlab('rosbags2/sinusoids3.bag',1); % Get the joint trajectory and corresponding current
-%[t,js,eff]=FullBagToMatlab('rosbags2/const_vel_levels.bag'); %two different types of bags were created, so second parser here
+[t,js,eff]=BagToMatlab('rosbags_3/id_traj.bag',1); % Get the joint trajectory and corresponding current
 
 SimGeneric();
 save 'FindGoodTorqueArmTraj.mat' t js eff tau
 
-options=optimoptions('surrogateopt','CheckpointFile','checkpoint_torque_arm.mat','Display','iter','UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',10000000000000000);
+options=optimoptions('surrogateopt','CheckpointFile','checkpoint_current_torque.mat','Display','iter','UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',10000000000000000);
 [x_work,fval,exitflag,output]=surrogateopt(@combine,[3.5,8,.3,.6,0,0,3],[5,12,.6,.9,3,3,6],options);
 %[x_work,fval,exitflag,output]=surrogateopt('checkpoint_torque_arm.mat',options );
 function f=combine(x)

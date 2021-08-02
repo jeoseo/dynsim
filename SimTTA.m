@@ -1,1 +1,0 @@
-%Just a pendulum motion simulation, not using my other functions
