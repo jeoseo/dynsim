@@ -2,3 +2,5 @@ GEN/*
 !GEN/README.txt 
 *.asv
 *.avi
+*.png
+*.mat
