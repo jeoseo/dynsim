@@ -9,16 +9,20 @@ close all;
 addpath("GEN/");
 
 InitUnknownParamsMBJoint4(); %I plug in what I "should" know about the robot, and represent the rest with symbolic
-[t,js,eff]=BagToMatlab('rosbags_MB/DPI_2.bag',4,0); %Replaces SimMB, we have real values now
+[t,js,eff]=BagToMatlab('rosbags_MB/joint_4_id.bag',4,1); %Replaces SimMB, we have real values now
 sim=false; %tells the rest of the program to not add noise into the signal for simulation purposes
 
-%cut out data from first 3 joints as we are only concerned about the last
-%one
-js=[js(4,:);js(8,:);js(12,:)];
-eff=eff(4,:);
+%the joint state is shortened, because the bag file collects data for all 4
+%joints, but we were only interested in the 4th joint
+%This means that if you collect data for a different motor on the robot,
+%THIS MUST BE CHANGED
+joint_number=4;
+DOF=4;
+js=[js(joint_number,:);js(joint_number+DOF,:);js(joint_number+2*DOF,:)];
+eff=eff(joint_number,:);
+
 %convert effort into torque
 [tau,mode]=ComputeTauFromEff(eff,js,a);
-%tau=eff*4.5*a(8);
 IdentifyMB(); %I refactor the dynamics equation to solve for the inertial parameters with LMS and the js, tau vectors
 
 th=sym('th',[DOF,1]);

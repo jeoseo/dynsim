@@ -4,11 +4,11 @@ motors and the dynamic parameters of the robot
 In general:
 Derive=function that symbolically generates another function to compute some expression
 Compute=function intended on using the derived expression and real numbers to create some numeric result
-Sim=Simulates the dynamics of some robot 
+Sim=Simulates the dynamics of some robot, or is working with a simulated robot 
 Identify=Identify some robot or relationship 
 FindGood=Uses the surrogate optimizer to find an optimal set of parameters for some function
 Full=Runs multiple other scripts, executable
-
+ 
 Important Files:
 FindGoodTorqueArm - used to find parameters for the current-torque of a Dynamixel given a rosbag of joint states
 FindGoodTraj - used to find the parameters for the excitation trajectory of some robot

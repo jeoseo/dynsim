@@ -4,9 +4,17 @@
 rng(232); %I changed this occaasionally just to see what other results were possible
 addpath(genpath('GEN')); %Add path for generated functions
 %Nothing should be attached to the motor while testing
-[t,js,eff]=BagToMatlab('rosbags_4/nothing_attached_sinusoids.bag',4,0); % Get the joint trajectory and corresponding current
-js=[js(4,:);js(8,:);js(12,:)];
-eff=eff(4,:);
+[t,js,eff]=BagToMatlab('rosbags_detached/motor_4_id.bag',4,0); % Get the joint trajectory and corresponding current
+
+%the joint state is shortened, because the bag file collects data for all 4
+%joints, but we were only interested in the 4th joint
+%This means that if you collect data for a different motor on the robot,
+%THIS MUST BE CHANGED
+joint_number=4;
+DOF=4;
+js=[js(joint_number,:);js(joint_number+DOF,:);js(joint_number+2*DOF,:)];
+eff=eff(joint_number,:);
+
 tau=zeros(1,size(t,2)); %no external torque, so all zeros
 
 save 'FindGoodTorqueArmTraj.mat' t js eff tau

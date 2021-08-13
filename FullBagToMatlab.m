@@ -1,4 +1,4 @@
-%This is for bags collect via command line, aka
+%This is for bags collected via command line, aka
 %rosbag record -a
 
 %Takes the bag file and initializes the variables t, js, and eff
