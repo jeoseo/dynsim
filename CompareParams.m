@@ -1,11 +1,8 @@
+%Creates a table ofidentified versus the simulated "real" parameters
 
 
-InitParamsMB();
-C_tau=eye(size(Fshrunk,1))*tau_sigma;
-C_F=(Fshrunk'*C_tau^(-1)*Fshrunk)^(-1);
-%[U,S,V]=svd(C_F);
-%diagS=diag(S);
-
+%Replace this line with an initialization of the real parameters
+InitSimParamsMB();
 %hard coded vector of parameters
 real_params=[I(1,1,2);I(1,1,3);I(1,1,4);I(2,1,2);I(2,1,3);I(2,1,4);...
     I(3,1,2);I(3,1,3);I(3,1,4);I(2,2,2);I(2,2,3);I(2,2,4);...
@@ -13,6 +10,14 @@ real_params=[I(1,1,2);I(1,1,3);I(1,1,4);I(2,1,2);I(2,1,3);I(2,1,4);...
     fc(1);fc(2);fc(3);fc(4);fv(1);fv(2);fv(3);fv(4);m(2);...
     m(2)*r(2,2);m(2)*r(3,2);m(3);m(3)*r(2,3);m(3)*r(3,3);m(4);...
     m(4)*r(2,4);m(4)*r(3,4)];
+
+%Populates the covariance matrices in case someone wants them
+C_tau=eye(size(Fshrunk,1))*tau_sigma;
+C_F=(Fshrunk'*C_tau^(-1)*Fshrunk)^(-1);
+%[U,S,V]=svd(C_F);
+%diagS=diag(S);
+
+
 
 %Because our parameters are dependent, rearrange the parameters in
 %terms of what the identification procedure should produce

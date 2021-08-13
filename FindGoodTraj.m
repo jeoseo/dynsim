@@ -1,8 +1,11 @@
-%requires phi, get this from FullMB
+%Optimizes the excitation trajectory for the manufacturing base robot
+
+%requires the GEN folder to be populated with ComputePhiMB
+%this can be done by running FullSimMB
 rng(2);
 addpath(genpath('GEN')); %Add path for generated functions
 
-
+%lower bound and upper bound of -.5 and .6 can be experimented with
 options=optimoptions('surrogateopt','CheckpointFile','checkpoint2.mat','Display','iter','UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',24*1000);
 [x_work,fval,exitflag,output]=surrogateopt(@combine,-.5*ones(24,1),.6*ones(24,1),options);
 %[x_work,fval,exitflag,output]=surrogateopt('checkpoint.mat',options);
@@ -15,19 +18,17 @@ function minimize=ComputeDOptimal(x)
     Tf=10; %end of sim (start of sim should always be t=0)
     dt=.01; %time step for recording joint state
     t=0:dt:Tf; %timesteps for changing torque
-    [t_out,js]=ComputeJs(t,x);
+    [~,js]=ComputeJs(t,x);
     DOF=4;
+    %Generate and reduce F to its independent columns
     F=[];
     for i=1:10:size(js,2)
         F=[F;ComputePhiMB(js(1:4,i),js(5:8,i),js(9:12,i))]; %We stack our phi's together to do least mean squares
     end
     [~,indcolF]=rref(F);
-    if size(indcolF,2)==32
+    if size(indcolF,2)==32 %hardcoded to make sure that we correctly find the right number of independent parameters
         Fshrunk=F(:,indcolF);
-        %minimize=max(diag(inv(Fshrunk'*Fshrunk)));
         minimize=real(-log(det(Fshrunk'*Fshrunk)));
-        %[U,S,V]=svd(Fshrunk'*Fshrunk);
-        %minimize=log(max(diag(S));
     else
         minimize=1000;
     end

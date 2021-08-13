@@ -1,21 +1,26 @@
 %This is for bags collect via command line, aka
 %rosbag record -a
-function [t,js,tau]=FullBagToMatlab(filename)
+
+%Takes the bag file and initializes the variables t, js, and eff
+
+%if filt=0, filter nothing
+%if filt=1, filter both the joint state and the current
+%if filt=2, filter only joint state
+function [t,js,eff]=FullBagToMatlab(filename,DOF,filt)
     bag=rosbag(filename);
     
     pos=readMessages(select(bag,'Topic','/joint_pos_actual'));
     vel=readMessages(select(bag,'Topic','/joint_vel_actual'));
-    eff=readMessages(select(bag,'Topic','/joint_effort_actual'));
-    DOF=1;
+    cur=readMessages(select(bag,'Topic','/joint_effort_actual'));
     t=[];
     t_count=1;
     t_start=bag.StartTime; %the first time stamp
     %for simplicity, we assume pos, vel, and eff are collected at the same
     %time, so we only accumulate one time (t) vector
     for i=1:size(pos,1)-2 % truncated slightly because sometimes there is one less position collected than the other values
-        js(1,i)=pos{i}.Data(1);
-        tau(1,i)=eff{i}.Data(1);
-        js(2,i)=vel{i}.Data(1);
+        js(1:DOF,i)=pos{i}.Data(1:DOF);
+        eff(1:DOF,i)=cur{i}.Data(1:DOF);
+        js(1+DOF:2*DOF,i)=vel{i}.Data(1:DOF);
     end
     for i=1:size(bag.MessageList,1)
         temp_cell=cellstr(bag.MessageList{i,2});
@@ -34,9 +39,17 @@ function [t,js,tau]=FullBagToMatlab(filename)
         js(1+2*DOF:3*DOF,i)=(js(1+DOF:2*DOF,i+1)-js(1+DOF:2*DOF,i-1))/(t(i+1)-t(i-1));
     end
     
-    %torque tends to be too noisy without this
-    tau=lowpass(tau,.5);
-    
-    %[t,js]=ComputeFilteredJs(t,js, DOF);
-    %tau=tau(3:end-2); %to match size with t
+    %if filt option=1, joint state filtered with fourier filter and current
+    %filtered with lowpass
+    if filt==1
+        [t,js]=ComputeFilteredJs(t,js, DOF);
+        eff=eff(:,3:end-2); %to match size with t
+        for i=1:DOF
+            eff(i,:)=lowpass(eff(i,:),.1);
+        end
+    end
+    if filt==2
+        [t,js]=ComputeFilteredJs(t,js, DOF);
+        eff=eff(:,3:end-2); %to match size with t        
+    end
 end

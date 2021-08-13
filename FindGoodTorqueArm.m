@@ -1,45 +1,30 @@
-%requires phi, get this from FullMB
-rng(25);
-addpath(genpath('GEN')); %Add path for generated functions
-InitParamsTTA(); %I plug in all known robot parameters
-[t,js,eff]=BagToMatlab('rosbags_3/id_traj.bag',1); % Get the joint trajectory and corresponding current
+%This is the optimization routine for finding a good set of motor
+%parameters to convert between current and torque
 
-SimGeneric();
+rng(232); %I changed this occaasionally just to see what other results were possible
+addpath(genpath('GEN')); %Add path for generated functions
+%Nothing should be attached to the motor while testing
+[t,js,eff]=BagToMatlab('rosbags_4/nothing_attached_sinusoids.bag',4,0); % Get the joint trajectory and corresponding current
+js=[js(4,:);js(8,:);js(12,:)];
+eff=eff(4,:);
+tau=zeros(1,size(t,2)); %no external torque, so all zeros
+
 save 'FindGoodTorqueArmTraj.mat' t js eff tau
 
 options=optimoptions('surrogateopt','CheckpointFile','checkpoint_current_torque.mat','Display','iter','UseParallel',true,'MinSampleDistance',.1,'MinSurrogatePoints',24*10,'MaxFunctionEvaluations',10000000000000000);
-[x_work,fval,exitflag,output]=surrogateopt(@combine,[3.5,8,.3,.6,0,0,3],[5,12,.6,.9,3,3,6],options);
-%[x_work,fval,exitflag,output]=surrogateopt('checkpoint_torque_arm.mat',options );
+%To stop the optimization routine, press stop on the gui that pops up. The
+%result will be located in a_work (the rest of these outputs are for
+%debugging, see https://www.mathworks.com/help/gads/surrogateopt.html)
+[a_work,fval,exitflag,output]=surrogateopt(@combine,[4.5-3,4.5-3,0.3, .5, 1, 0,2,2.5],[4.5+3,4.5+3,1,1.5,3,3,8,2.5],options);
+
+%In case one wants to continue an optimization from where it was left off
+%[a_work,fval,exitflag,output]=surrogateopt('checkpoint_torque_arm.mat',options );
 function f=combine(x)
     f.Fval=ComputeRMSTau(x);
 end
 
-
 function minimize=ComputeRMSTau(a)
-    %x contains torque coefficients,Irr,fc, fv, fs
-    %constant 
     load FindGoodTorqueArmTraj.mat t js eff tau;
-    tau_pred=[];
-    for i=2:size(tau,2)
-        slope1=a(1);
-        slope2=a(2);
-        if abs(js(2,i))>.1 %outside stribeck effect, .1 rad/sec is where i have it for now
-            f=sign(js(2,i))*a(4)+js(2,i)*a(5);
-            if abs(f) > a(7) %saturation point
-                f=a(7)*sign(f);
-            end
-        else %inside stribeck effect
-            f=sign(js(2,i))*a(6)-js(2,i)*(a(6)-a(4)-.1*a(5))/.1;
-        end
-        tau_pred(i)=(eff(1,i))*slope2-slope2/slope1*(f+a(3)*js(3,i));   
-        if (tau_pred(i)>=0 &&  js(2,i) >=0) || (tau_pred(i)<=0 &&  js(2,i) <=0 )
-            tau_pred(i)=(eff(1,i))*slope1-f-a(3)*js(3,i);
-        end
-        %some fudging to reduce spikes
-        fudge=1;
-        if abs(tau_pred(i)-tau_pred(i-1)) > fudge&&  i>5
-            tau_pred(i)=tau_pred(i-1)+sign(tau_pred(i)-tau_pred(i-1))*fudge;
-        end
-    end
-    minimize=rms(tau_pred-tau);
+    eff_pred=ComputeEffFromTau(tau,js,a);
+    minimize=rms(eff_pred-eff);
 end

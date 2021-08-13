@@ -22,14 +22,14 @@ for i=1:(size(js,2))
 end
 f1=figure;
 hold on;
-plot(t(3:end-2),tau(1,:));
-plot(t(3:end-2),new_tau(1,:));
-plot(t(3:end-2),tau(2,:));
-plot(t(3:end-2),new_tau(2,:));
-plot(t(3:end-2),tau(3,:));
-plot(t(3:end-2),new_tau(3,:));
-plot(t(3:end-2),tau(4,:));
-plot(t(3:end-2),new_tau(4,:));
+plot(t,tau(1,:));
+plot(t,new_tau(1,:));
+plot(t,tau(2,:));
+plot(t,new_tau(2,:));
+plot(t,tau(3,:));
+plot(t,new_tau(3,:));
+plot(t,tau(4,:));
+plot(t,new_tau(4,:));
 diff_tau=new_tau-tau;
 LMS=sqrt(sum(diff_tau(:).^2)/size(diff_tau(:),1));
 title('Torque Comparison for Excitation Trajectory')
@@ -57,7 +57,7 @@ for i=1:(size(js,2))
 end
 
 %Now compute "real" torque for new trajectory
-InitParamsMB();
+InitSimParamsMB();
 derive=1;
 J=DeriveBodyJacobians(DOF,q,w,g,derive);
 D=DeriveD(J, I,m, DOF,derive);

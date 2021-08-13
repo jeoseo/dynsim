@@ -28,17 +28,17 @@ q=[0 0 0;0 .185 .197;0 .535 .197;0 .885 .197]';
 gravity=[0;0;-9.81];
 fc=[1,2,3,1]; %coulomb friction
 fv=[1,2,3,1]; %viscous friction
-Tf=10; %end of sim (start of sim should always be t=0)
+Tf=30; %end of sim (start of sim should always be t=0)
 dt=.01; %time step for recording joint state
 t=0:dt:Tf; %timesteps for changing torque
-%Updated values for prametrization
+%Updated values for trajectory parametrization
 x=[ 0.2899   -0.4105   -0.0183    0.0195   -0.0084    0.0103    0.5635   -0.2483   -0.1638    0.0293   -0.1453    0.0166   -0.3672 -0.2073   -0.0293   -0.0859    0.2535    0.1632    0.3378   -0.3946    0.0427    0.0766   -0.1676   -0.0045];
-%x=[-0.3648   -0.2254   -0.3879    0.5091   -0.1360    0.4864    0.6000   -0.2443   -0.1809   -0.0976   -0.1563    0.1055   -0.5000  -0.0710   -0.2473    0.0390   -0.3405   -0.0580   -0.1898   -0.3786    0.3944    0.1820   -0.1479   -0.1242];
+%x=[  0.1139   -0.0805    0.5682   -0.3848   -0.4577   -0.5000    0.4034    0.3270    0.0493    0.0078    0.0458    0.1439   -0.5000    0.0570   -0.4366  -0.0089   -0.2825    0.0393    0.0805   -0.4012   -0.1533    0.3515   -0.1311    0.0416];
 
 
 
 
 [t,js]=ComputeJs(t,x);
-%js=randn(size(js,1),size(js,2)); %for random trajectory
-pos_sigma=0.01; %std deviation for white noise on position data
+sim=1; %in sim mode
+pos_sigma=0.001; %std deviation for white noise on position data
 tau_sigma=1; %std devation for white noise on torque data

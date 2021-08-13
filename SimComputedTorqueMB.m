@@ -6,7 +6,7 @@
 kp=50;
 kd=5;% random guess
 
-InitParamsMB();
+InitSimParamsMB();
 t=0:.01:10;%timestep is the same as always
 %x=[1 0 0 0 1 0 0 0 1 0 0 0 1 0 0 0];
 x=randn(1,24)*.3; %simple for now
@@ -43,7 +43,7 @@ for i=1:(size(t,2)-1)
 end
  
 %Identified parameters
-InitBadParamsMB();
+InitUnknownParamsMB();
 th=sym('th',[DOF,1]);
 thd=sym('thd',[DOF,1]);
 thdd=sym('thdd',[DOF,1]);

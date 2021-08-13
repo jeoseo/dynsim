@@ -1,6 +1,5 @@
-
 %Computes the torque for some given trajectory and robot
-%requires a robot's parameters to have been initialized (like InitParamsMB)
+%requires a robot's parameters to have been initialized (like InitSimParamsMB)
 
 addpath(genpath('GEN')); %Add path for generated functions
 
